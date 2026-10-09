@@ -24,7 +24,13 @@ supabase=create_client(
     SUPABASE_PUBLISHABLE_KEY
 )
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "templates"
+    )
+)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 if not app.secret_key:
     raise RuntimeError("FLASK_SECRET_KEY must be set in .env")
