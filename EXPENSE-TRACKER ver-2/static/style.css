@@ -1,0 +1,1025 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap");
+
+/* ==========================================================
+   Expense Tracker: design tokens
+   ========================================================== */
+:root {
+    color-scheme: light dark;
+
+    --bg: #eef3ef;
+    --surface: #ffffff;
+    --surface-2: #f5f9f6;
+    --ink: #0f2219;
+    --muted: #5a6e64;
+    --line: #d6e1da;
+    --line-strong: #bccbc2;
+
+    --brand: #1b6b4f;
+    --brand-2: #2a9470;
+    --brand-strong: #124a37;
+    --on-brand: #ffffff;
+    --danger: #b93a2b;
+
+    --hero-from: #0f2a20;
+    --hero-to: #1d5c44;
+    --hero-ink: #d5e8de;
+    --hero-accent: #f4b63f;
+
+    --ring: color-mix(in srgb, var(--brand) 28%, transparent);
+
+    --radius-xl: 24px;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 10px;
+
+    --shadow-sm: 0 1px 2px rgba(15, 34, 25, 0.06);
+    --shadow: 0 1px 2px rgba(15, 34, 25, 0.05), 0 8px 24px rgba(15, 34, 25, 0.07);
+    --shadow-lg: 0 2px 4px rgba(15, 34, 25, 0.08), 0 18px 40px rgba(15, 34, 25, 0.16);
+
+    --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --font-body: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --flash-duration: 4s; /* set this to match your JS auto-dismiss time */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0a1511;
+        --surface: #13231c;
+        --surface-2: #101e18;
+        --ink: #e8f1ec;
+        --muted: #92a89d;
+        --line: #25382f;
+        --line-strong: #34493f;
+
+        --brand: #3fb88a;
+        --brand-2: #58d1a2;
+        --brand-strong: #5ccfa2;
+        --on-brand: #05120c;
+        --danger: #f08a7a;
+
+        --hero-from: #12362a;
+        --hero-to: #1f6048;
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+        --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ==========================================================
+   Base
+   ========================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--bg);
+    scroll-behavior: smooth;
+}
+
+/* Soft ambient glow behind everything */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60rem 34rem at 88% -8%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 62%),
+        radial-gradient(42rem 28rem at -8% 8%, color-mix(in srgb, var(--hero-accent) 11%, transparent), transparent 62%);
+}
+
+body {
+    margin: 0 auto;
+    max-width: 960px;
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2.5rem);
+    padding-bottom: 4rem;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+    font-family: var(--font-display);
+    color: var(--ink);
+}
+
+h1::first-letter,
+h2::first-letter {
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 0 0 1.5rem;
+    font-size: clamp(1.9rem, 6vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+}
+
+h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 2.75rem 0 1rem;
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Small accent bar before every section title */
+h2::before {
+    content: "";
+    flex-shrink: 0;
+    width: 4px;
+    height: 1.1em;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--brand-2), var(--hero-accent));
+}
+
+/* ==========================================================
+   Entrance animation (backwards fill, so hover transforms still work)
+   ========================================================== */
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-stats p,
+.currency-box,
+.chart-container,
+#categoryList p,
+body > p,
+.expense,
+.add-expense-card {
+    animation: rise 0.55s var(--ease) backwards;
+}
+
+.dashboard-stats p:nth-child(2) { animation-delay: 0.06s; }
+.dashboard-stats p:nth-child(3) { animation-delay: 0.12s; }
+.dashboard-stats p:nth-child(4) { animation-delay: 0.18s; }
+
+#categoryList p:nth-child(2) { animation-delay: 0.05s; }
+#categoryList p:nth-child(3) { animation-delay: 0.1s; }
+#categoryList p:nth-child(4) { animation-delay: 0.15s; }
+#categoryList p:nth-child(n + 5) { animation-delay: 0.2s; }
+
+/* ==========================================================
+   Dashboard stats
+   ========================================================== */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+}
+
+.dashboard-stats p {
+    position: relative;
+    margin: 0;
+    padding: 1.15rem 1.3rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: lowercase;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s;
+}
+
+.dashboard-stats p::first-letter {
+    text-transform: uppercase;
+}
+
+.dashboard-stats p:not(:first-child):hover {
+    transform: translateY(-3px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Thin accent line on the secondary cards */
+.dashboard-stats p:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    left: 1.3rem;
+    top: 0;
+    width: 2.2rem;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: var(--brand-2);
+}
+
+.dashboard-stats span {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* Total spending is the one thing that gets to be loud */
+.dashboard-stats p:first-child {
+    overflow: hidden;
+    padding: clamp(1.4rem, 4vw, 2.2rem);
+    background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
+    border: 0;
+    border-radius: var(--radius-xl);
+    color: var(--hero-ink);
+    box-shadow: var(--shadow-lg);
+}
+
+.dashboard-stats p:first-child::after {
+    content: "";
+    position: absolute;
+    right: -4.5rem;
+    top: -5rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--hero-accent) 38%, transparent), transparent 66%);
+    pointer-events: none;
+}
+
+.dashboard-stats p:first-child span {
+    margin-top: 0.45rem;
+    color: var(--hero-accent);
+    font-size: clamp(2.3rem, 9vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+}
+
+@media (min-width: 600px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .dashboard-stats p:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ==========================================================
+   Currency
+   ========================================================== */
+.currency-box {
+    display: inline-block;
+    max-width: 100%;
+    margin: 0;
+    padding: 0.85rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    font-size: 1.02rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.currency-box p {
+    margin: 0;
+}
+
+#usdToInr {
+    color: var(--brand);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   Buttons
+   ========================================================== */
+button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 46px;
+    margin-top: 0.75rem;
+    padding: 0.65rem 1.5rem;
+    background: linear-gradient(180deg, var(--brand-2), var(--brand));
+    color: var(--on-brand);
+    border: 1px solid var(--brand-strong);
+    border-radius: var(--radius-sm);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 6px 16px color-mix(in srgb, var(--brand) 30%, transparent);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), filter 0.18s, background-color 0.18s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 10px 22px color-mix(in srgb, var(--brand) 38%, transparent);
+}
+
+button:active {
+    transform: translateY(0) scale(0.98);
+    filter: brightness(0.97);
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+}
+
+/* The currency switch is secondary, so it is outlined */
+#currencyToggle {
+    margin-top: 0.9rem;
+    background: transparent;
+    color: var(--brand);
+    border: 2px solid var(--brand);
+    box-shadow: none;
+}
+
+#currencyToggle:hover {
+    background: var(--brand);
+    color: var(--on-brand);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+@media (max-width: 479px) {
+    #currencyToggle,
+    form button {
+        width: 100%;
+    }
+
+    .currency-box {
+        display: block;
+    }
+}
+
+/* ==========================================================
+   Category totals
+   ========================================================== */
+#categoryList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: 0.8rem;
+}
+
+#categoryList p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--brand-2);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
+}
+
+#categoryList p:hover {
+    transform: translateY(-2px);
+    border-left-color: var(--hero-accent);
+    box-shadow: var(--shadow);
+}
+
+.category-amount {
+    flex-shrink: 0;
+    padding: 0.15rem 0.6rem;
+    background: color-mix(in srgb, var(--brand) 12%, transparent);
+    color: var(--brand);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================
+   Chart
+   ========================================================== */
+.chart-section {
+    margin: 2.75rem 0;
+}
+
+.chart-title {
+    margin: 0 0 1rem;
+    text-align: left;
+}
+
+.chart-container {
+    position: relative; /* required for Chart.js responsive sizing */
+    width: 100%;
+    max-width: 640px;
+    height: clamp(290px, 55vw, 410px);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 1.6rem);
+    background:
+        radial-gradient(24rem 14rem at 100% 0%, color-mix(in srgb, var(--brand) 9%, transparent), transparent 70%),
+        var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+}
+
+.chart-container canvas {
+    display: block; /* removes the gap under inline canvases */
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ==========================================================
+   Forms
+   ========================================================== */
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem 1rem;
+    margin: 0;
+    padding: clamp(1.1rem, 4vw, 1.9rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+}
+
+form br {
+    display: none;
+}
+
+label {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: lowercase;
+}
+
+label::first-letter {
+    text-transform: uppercase;
+}
+
+input,
+select {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.65rem 0.9rem;
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 1rem; /* 16px stops iOS zooming into the field */
+    transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
+}
+
+input:hover,
+select:hover {
+    border-color: var(--line-strong);
+}
+
+select {
+    appearance: none;
+    padding-right: 2.4rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%238a9d93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.95rem center;
+    cursor: pointer;
+}
+
+input::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    background-color: var(--surface);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Search and filter */
+@media (min-width: 640px) {
+    form[action="/"] {
+        grid-template-columns: 6.5rem 1fr;
+        align-items: center;
+    }
+
+    form[action="/"] label {
+        margin-top: 0;
+    }
+
+    form[action="/"] button {
+        grid-column: 2;
+        justify-self: start;
+    }
+}
+
+@media (min-width: 960px) {
+    form[action="/"] {
+        grid-template-columns: repeat(4, 1fr) auto;
+        grid-template-rows: auto auto;
+        grid-auto-flow: column;
+        align-items: end;
+    }
+
+    form[action="/"] button {
+        grid-column: auto;
+        grid-row: 1 / span 2;
+        align-self: end;
+        margin-top: 0;
+    }
+}
+
+/* Add expense (inline form) */
+@media (min-width: 640px) {
+    form[action="/add"] {
+        grid-template-columns: 8.5rem minmax(0, 28rem);
+        gap: 1rem;
+        align-items: center;
+    }
+
+    form[action="/add"] label {
+        margin-top: 0;
+    }
+
+    form[action="/add"] button {
+        grid-column: 2;
+        justify-self: start;
+    }
+}
+
+/* Login / sign up / password pages: a comfortable centred card */
+form[action="/login"],
+form[action="/signup"],
+form[action="/forgot-password"] {
+    max-width: 28rem;
+    margin-inline: auto;
+}
+
+/* ==========================================================
+   Expense rows
+   ========================================================== */
+body > p,
+.expense {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    margin: 0 0 0.7rem;
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow-wrap: anywhere;
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
+}
+
+body > p:hover,
+.expense:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+}
+
+body > p .expense-amount,
+.expense .expense-amount {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Stagger only the first rows, so long lists never feel slow */
+body > p:nth-of-type(2),
+.expense:nth-child(2) { animation-delay: 0.04s; }
+body > p:nth-of-type(3),
+.expense:nth-child(3) { animation-delay: 0.08s; }
+body > p:nth-of-type(4),
+.expense:nth-child(4) { animation-delay: 0.12s; }
+body > p:nth-of-type(n + 5),
+.expense:nth-child(n + 5) { animation-delay: 0.16s; }
+
+/* ==========================================================
+   Links: edit and delete
+   ========================================================== */
+a {
+    color: var(--brand);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s, transform 0.18s var(--ease);
+}
+
+a:hover {
+    color: var(--brand-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+a[href^="/edit"],
+a[href^="/delete"] {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0.25rem 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+a[href^="/edit"]:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: var(--on-brand);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+a[href^="/delete"] {
+    margin-left: auto; /* pushes the action buttons to the right edge */
+    color: var(--danger);
+}
+
+a[href^="/delete"]:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--surface);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================
+   Flash pop-ups
+   ========================================================== */
+#flash-container {
+    position: fixed;
+    top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: min(390px, calc(100% - 2.5rem));
+    pointer-events: none;
+}
+
+.flash-message {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    overflow: hidden;
+    padding: 1rem 1rem 1rem 1.1rem;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    pointer-events: auto;
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    animation: popupSlideIn 0.45s var(--ease) forwards;
+}
+
+/* Round status icon */
+.flash-message::before {
+    content: "✓";
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.flash-message.error::before   { content: "!"; }
+.flash-message.warning::before { content: "!"; }
+
+/* Countdown bar along the bottom edge */
+.flash-message::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.45;
+    transform-origin: left;
+    animation: flashCountdown var(--flash-duration) linear forwards;
+}
+
+.flash-message.success {
+    background: linear-gradient(135deg, rgba(30, 100, 70, 0.97), rgba(14, 52, 40, 0.97));
+    border: 1px solid rgba(100, 255, 190, 0.4);
+    color: #d9ffef;
+}
+
+.flash-message.error {
+    background: linear-gradient(135deg, rgba(128, 42, 42, 0.97), rgba(72, 20, 20, 0.97));
+    border: 1px solid rgba(255, 120, 120, 0.4);
+    color: #ffe2e2;
+}
+
+.flash-message.warning {
+    background: linear-gradient(135deg, rgba(124, 92, 30, 0.97), rgba(72, 50, 15, 0.97));
+    border: 1px solid rgba(255, 210, 100, 0.4);
+    color: #fff1c7;
+}
+
+.flash-text {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* Reset the global button styles for the close button */
+.flash-close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    color: inherit;
+    border: none;
+    border-radius: 50%;
+    box-shadow: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.flash-close:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(1.1);
+    filter: none;
+    box-shadow: none;
+}
+
+/* Exit: add any of these classes from your JS before removing the element */
+.flash-message.hide,
+.flash-message.hiding,
+.flash-message.closing,
+.flash-message.removing,
+.flash-message.fade-out {
+    animation: popupSlideOut 0.3s ease forwards;
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes popupSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+}
+
+@keyframes flashCountdown {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+@media (max-width: 600px) {
+    #flash-container {
+        top: calc(1rem + env(safe-area-inset-top, 0px));
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+    }
+}
+
+/* ==========================================================
+   Add expense page
+   ========================================================== */
+.add-expense-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2.5rem 1.25rem;
+}
+
+.add-expense-container {
+    width: 100%;
+    max-width: 550px;
+}
+
+.add-expense-card {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    background:
+        radial-gradient(22rem 12rem at 100% 0%, color-mix(in srgb, var(--brand) 11%, transparent), transparent 70%),
+        var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+/* If the page's <form> sits inside the card, don't draw a second card */
+.add-expense-card form,
+.add-expense-card form[action="/add"] {
+    display: block;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.add-expense-card h1 {
+    margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+    margin: 0 0 1.9rem;
+    color: var(--muted);
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin: 0 0 0.45rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+}
+
+.form-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1.9rem;
+}
+
+.save-expense-btn,
+.cancel-expense-btn {
+    min-height: 46px;
+    margin: 0;
+    padding: 0.7rem 1.6rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cancel-expense-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line-strong);
+    text-decoration: none;
+}
+
+.cancel-expense-btn:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+    border-color: var(--muted);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* The link that opens the add-expense page: a clear call to action */
+.add-expense-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.8rem 1.4rem;
+    background: linear-gradient(180deg, var(--brand-2), var(--brand));
+    color: var(--on-brand);
+    border: 1px solid var(--brand-strong);
+    border-radius: var(--radius-sm);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 6px 16px color-mix(in srgb, var(--brand) 30%, transparent);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), filter 0.18s;
+}
+
+.add-expense-link:hover {
+    color: var(--on-brand);
+    text-decoration: none;
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 10px 22px color-mix(in srgb, var(--brand) 38%, transparent);
+}
+
+@media (max-width: 479px) {
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    .save-expense-btn,
+    .cancel-expense-btn {
+        width: 100%;
+    }
+}
+
+/* ==========================================================
+   Accessibility and polish
+   ========================================================== */
+:focus-visible {
+    outline: 3px solid var(--hero-accent);
+    outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible {
+    outline: none; /* these already show a focus ring */
+}
+
+::selection {
+    background: var(--hero-accent);
+    color: #10241c;
+}
+
+/* Thin, themed scrollbars */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+}
+
+/* Keep motion tiny instead of removing it, so animationend still fires for your flash JS */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
