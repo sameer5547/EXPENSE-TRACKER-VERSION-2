@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='auth.css')}}">
+    <title>LOGIN - Expense Tracker</title>
+</head>
+
+<body>
+    <div id="flash-container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <div class="flash-message {{ category }}">
+
+                <span class="flash-text">
+                    {{ message }}
+                </span>
+
+                <button
+                    type="button"
+                    class="flash-close"
+                    onclick="closeFlash(this)"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+</div>
+
+    <h1>EXPENSE TRACKER</h1>
+
+    <form method="POST" action="/login">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <br><br>
+
+        <div class="password-container">
+    <input
+        type="password"
+        name="password"
+        id="loginPassword"
+        placeholder="Enter your password"
+        required
+    >
+
+    <button type="button" onclick="togglePassword('loginPassword', this)">
+        show password
+    </button>
+</div>
+
+        <br><br>
+
+        <button type="submit">Login</button>
+
+    </form>
+    <p>
+    <a href="/forgot-password">Forgot Password?</a>
+   </p>
+
+    <p>
+        Don't have an account?
+        <a href="/signup">Create Account</a>
+    </p>
+
+    <script>
+function togglePassword(inputId, button) {
+    const passwordInput = document.getElementById(inputId);
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        button.textContent = "hide password";
+    } else {
+        passwordInput.type = "password";
+        button.textContent = "show password";
+    }
+}
+
+function closeFlash(button) {
+
+    const message =
+        button.closest(".flash-message");
+
+    if (!message) {
+        return;
+    }
+
+    message.style.animation =
+        "popupSlideOut 0.3s ease forwards";
+
+    setTimeout(function() {
+
+        message.remove();
+
+    }, 300);
+}
+
+
+/* Automatically hide popup after 4 seconds */
+
+document.querySelectorAll(".flash-message")
+    .forEach(function(message) {
+
+        setTimeout(function() {
+
+            message.style.animation =
+                "popupSlideOut 0.3s ease forwards";
+
+            setTimeout(function() {
+
+                message.remove();
+
+            }, 300);
+
+        }, 4000);
+
+    });
+</script>
+</body>
+</html>

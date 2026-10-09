@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='auth.css')}}">
+    <title>SIGN UP - Expense Tracker</title>
+</head>
+
+<body>
+
+    <h1>CREATE ACCOUNT</h1>
+
+    <form method="POST" action="/signup">
+
+        <label>NAME:</label>
+        <input type="text" 
+        name="name"
+        placeholder="enter your name">
+
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <br><br>
+
+        <div class="password-container">
+    <input
+        type="password"
+        name="password"
+        id="signupPassword"
+        placeholder="Enter your password"
+        required
+    >
+
+    <button type="button" onclick="togglePassword('signupPassword', this)">
+        show password
+    </button>
+</div>
+        <br><br>
+
+        <button type="submit">Sign Up</button>
+
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="/login">Login</a>
+    </p>
+    <script>
+function togglePassword(inputId, button) {
+    const passwordInput = document.getElementById(inputId);
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        button.textContent = "show  password";
+    } else {
+        passwordInput.type = "password";
+        button.textContent = "hide password";
+    }
+}
+</script>
+
+</body>
+</html>
