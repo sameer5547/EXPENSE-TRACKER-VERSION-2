@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{url_for('static',filename='auth.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <title>SIGN UP - Expense Tracker</title>
 </head>
 
@@ -25,18 +26,11 @@
 
         <br><br>
 
-        <div class="password-container">
-    <input
-        type="password"
-        name="password"
-        id="signupPassword"
-        placeholder="Enter your password"
-        required
-    >
-
-    <button type="button" onclick="togglePassword('signupPassword', this)">
-        show password
-    </button>
+        <div class="password-wrapper">
+  <input type="password" id="password" name="password" placeholder="Enter your password" required>
+  <button type="button" class="toggle-eye" id="togglePassword" aria-label="Show password">
+    <i class="fa-solid fa-eye"></i>
+  </button>
 </div>
         <br><br>
 
@@ -49,17 +43,16 @@
         <a href="/login">Login</a>
     </p>
     <script>
-function togglePassword(inputId, button) {
-    const passwordInput = document.getElementById(inputId);
+ const pwd = document.getElementById("password");
+  const eye = document.getElementById("togglePassword");
+  const icon = eye.querySelector("i");
 
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        button.textContent = "show  password";
-    } else {
-        passwordInput.type = "password";
-        button.textContent = "hide password";
-    }
-}
+  eye.addEventListener("click", () => {
+    const show = pwd.type === "password";
+    pwd.type = show ? "text" : "password";
+    icon.classList.toggle("fa-eye", !show);
+    icon.classList.toggle("fa-eye-slash", show);
+  });
 </script>
 
 </body>
