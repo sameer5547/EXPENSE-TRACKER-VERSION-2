@@ -39,6 +39,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = False
 Session(app)
 
+@app.route("/health")
+def health():
+    return{"status": "ok"},200
 
 # ----------------------------------------------------------
 # Helpers
