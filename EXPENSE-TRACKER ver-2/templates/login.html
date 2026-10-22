@@ -3,120 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static',filename='auth.css')}}">
+    <title>Login - Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <title>LOGIN - Expense Tracker</title>
 </head>
+<body style="display: grid; place-items: center; min-height: 100vh; padding: 1rem;">
 
-<body>
+    <!-- Flash Messages -->
     <div id="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    <span class="flash-text">{{ message }}</span>
+                    <button type="button" class="flash-close" onclick="closeFlash(this)">&times;</button>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <div class="card" style="width: 100%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--borders); border-radius: var(--r-lg); padding: 2.25rem; box-shadow: var(--shadow);">
+        
+        <h1 style="margin: 0 0 0.5rem; font-size: 1.75rem; text-align: center;">Welcome Back</h1>
+        <p style="margin: 0 0 1.75rem; color: var(--secondary-text); font-size: 0.9rem; text-align: center;">
+            Log in to manage your personal finances.
+        </p>
 
-        {% for category, message in messages %}
-
-            <div class="flash-message {{ category }}">
-
-                <span class="flash-text">
-                    {{ message }}
-                </span>
-
-                <button
-                    type="button"
-                    class="flash-close"
-                    onclick="closeFlash(this)"
-                >
-                    ×
-                </button>
-
+        <form method="POST" action="/login">
+            <div class="field" style="margin-bottom: 1.25rem;">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
             </div>
 
-        {% endfor %}
+            <div class="field" style="margin-bottom: 1.25rem;">
+                <label for="password">Password</label>
+                <div class="password-wrapper" style="position: relative;">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required style="padding-right: 3rem;">
+                    <button type="button" class="toggle-eye" id="togglePassword" aria-label="Show password" style="position: absolute; right: 0.25rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; min-height: 38px; min-width: 38px; color: var(--secondary-text); cursor: pointer;">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
 
-    {% endwith %}
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                <a href="/forgot-password" style="font-size: 0.85rem;">Forgot Password?</a>
+            </div>
 
-</div>
+            <button type="submit" style="width: 100%; margin: 0;">Login</button>
+        </form>
 
-    <h1>EXPENSE TRACKER</h1>
+        <p style="margin: 1.5rem 0 0; text-align: center; color: var(--secondary-text); font-size: 0.9rem;">
+            Don't have an account? <a href="/signup">Create Account</a>
+        </p>
+    </div>
 
-    <form method="POST" action="/login">
+    <script>
+        const pwd = document.getElementById("password");
+        const eye = document.getElementById("togglePassword");
+        const icon = eye.querySelector("i");
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        eye.addEventListener("click", () => {
+            const show = pwd.type === "password";
+            pwd.type = show ? "text" : "password";
+            icon.classList.toggle("fa-eye", !show);
+            icon.classList.toggle("fa-eye-slash", show);
+        });
 
-        <br><br>
+        function closeFlash(button) {
+            const message = button.closest(".flash-message");
+            if (message) {
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 300);
+            }
+        }
 
-       <!-- Password Container -->
-<div class="password-wrapper">
-  <input type="password" id="password" name="password" placeholder="Enter your password" required>
-  <button type="button" class="toggle-eye" id="togglePassword" aria-label="Show password">
-    <i class="fa-solid fa-eye"></i>
-  </button>
-</div>
-
-        <br><br>
-
-        <button type="submit">Login</button>
-
-    </form>
-    <p>
-    <a href="/forgot-password">Forgot Password?</a>
-   </p>
-
-    <p>
-        Don't have an account?
-        <a href="/signup">Create Account</a>
-    </p>
-<script>
-   const pwd = document.getElementById("password");
-  const eye = document.getElementById("togglePassword");
-  const icon = eye.querySelector("i");
-
-  eye.addEventListener("click", () => {
-    const show = pwd.type === "password";
-    pwd.type = show ? "text" : "password";
-    icon.classList.toggle("fa-eye", !show);
-    icon.classList.toggle("fa-eye-slash", show);
-  });
-function closeFlash(button) {
-
-    const message =
-        button.closest(".flash-message");
-
-    if (!message) {
-        return;
-    }
-
-    message.style.animation =
-        "popupSlideOut 0.3s ease forwards";
-
-    setTimeout(function() {
-
-        message.remove();
-
-    }, 300);
-}
-
-
-/* Automatically hide popup after 4 seconds */
-
-document.querySelectorAll(".flash-message")
-    .forEach(function(message) {
-
-        setTimeout(function() {
-
-            message.style.animation =
-                "popupSlideOut 0.3s ease forwards";
-
-            setTimeout(function() {
-
-                message.remove();
-
-            }, 300);
-
-        }, 4000);
-
-    });
-</script>
+        document.querySelectorAll(".flash-message").forEach(message => {
+            setTimeout(() => {
+                if (message.isConnected) {
+                    message.style.opacity = "0";
+                    setTimeout(() => message.remove(), 300);
+                }
+            }, 4000);
+        });
+    </script>
 </body>
 </html>
