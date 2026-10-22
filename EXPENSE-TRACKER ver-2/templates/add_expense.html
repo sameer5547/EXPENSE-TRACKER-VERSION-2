@@ -1,218 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Expense - Expense Tracker</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
 </head>
+<body class="add-expense-body" style="display: grid; place-items: center; min-height: 100vh; padding: 1rem;">
 
-
-<body class="add-expense-body">
-
-
-    <!-- FLASH MESSAGES -->
-
+    <!-- Flash Messages -->
     <div id="flash-container">
-
         {% with messages = get_flashed_messages(with_categories=true) %}
-
             {% for category, message in messages %}
-
                 <div class="flash-message {{ category }}">
-
-                    <span>{{ message }}</span>
-
-                    <button type="button"
-                            onclick="closeFlash(this)">
-                        ×
-                    </button>
-
+                    <span class="flash-text">{{ message }}</span>
+                    <button type="button" class="flash-close" onclick="closeFlash(this)">&times;</button>
                 </div>
-
             {% endfor %}
-
         {% endwith %}
-
     </div>
 
+    <!-- Add Expense Card -->
+    <div class="add-expense-container" style="width: 100%; max-width: 420px;">
+        <div class="add-expense-card" style="background: var(--card-bg); border: 1px solid var(--borders); border-radius: var(--r-lg); padding: 2rem; box-shadow: var(--shadow);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h1 style="margin: 0; font-size: 1.5rem;">ADD EXPENSE</h1>
+                <a href="/" style="color: var(--secondary-text); font-size: 1.25rem; text-decoration: none;" aria-label="Close">&times;</a>
+            </div>
 
-    <!-- ADD EXPENSE CONTAINER -->
-
-    <div class="add-expense-container">
-
-        <div class="add-expense-card">
-
-            <h1>ADD EXPENSE</h1>
-
-            <p class="form-subtitle">
-                Record a new expense
+            <p class="form-subtitle" style="margin: 0 0 1.5rem; color: var(--secondary-text); font-size: 0.9rem;">
+                Record a new expense and keep your budget up to date.
             </p>
 
-
-            <form method="POST"
-                  action="/add">
-
-
-                <!-- AMOUNT -->
-
-                <div class="form-group">
-
-                    <label for="amount">
-                        AMOUNT
-                    </label>
-
-                    <input
-                        type="number"
-                        id="amount"
-                        name="amount"
-                        step="0.01"
-                        min="0.01"
-                        placeholder="Enter amount"
-                        required
+            <form method="POST" action="/add">
+                
+                <!-- Prominent Amount Input -->
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="amount" style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary-text);">Amount</label>
+                    <input 
+                        type="number" 
+                        id="amount" 
+                        name="amount" 
+                        step="0.01" 
+                        min="0.01" 
+                        placeholder="0.00" 
+                        required 
+                        style="font-size: 1.5rem; font-weight: 700; padding: 0.75rem 1rem;"
                     >
-
                 </div>
 
-
-                <!-- CATEGORY -->
-
-                <div class="form-group">
-
-                    <label for="category">
-                        CATEGORY
-                    </label>
-
-                    <input
-                        type="text"
-                        id="category"
-                        name="category"
-                        placeholder="Example: Food"
+                <!-- Category Selector -->
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="category" style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary-text);">Category</label>
+                    <input 
+                        type="text" 
+                        id="category" 
+                        name="category" 
+                        placeholder="e.g. Food & Drink, Transport, Shopping" 
                         required
                     >
-
                 </div>
 
-
-                <!-- DESCRIPTION -->
-
-                <div class="form-group">
-
-                    <label for="description">
-                        DESCRIPTION
-                    </label>
-
-                    <input
-                        type="text"
-                        id="description"
-                        name="description"
-                        placeholder="What did you spend on?"
+                <!-- Description / Paid To -->
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="description" style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary-text);">Description / Paid To</label>
+                    <input 
+                        type="text" 
+                        id="description" 
+                        name="description" 
+                        placeholder="What did you spend on or who did you pay?" 
                         required
                     >
-
                 </div>
 
-
-                <!-- DATE -->
-
-                <div class="form-group">
-
-                    <label for="date">
-                        DATE
-                    </label>
-
-                    <input
-                        type="date"
-                        id="date"
-                        name="date"
+                <!-- Date Selector -->
+                <div class="form-group" style="margin-bottom: 1.75rem;">
+                    <label for="date" style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary-text);">Date</label>
+                    <input 
+                        type="date" 
+                        id="date" 
+                        name="date" 
                         required
                     >
-
                 </div>
 
-
-                <!-- BUTTONS -->
-
-                <div class="form-buttons">
-
-                    <button type="submit"
-                            class="save-expense-btn">
-                        ADD EXPENSE
+                <!-- Action Buttons -->
+                <div class="form-buttons" style="display: flex; gap: 1rem;">
+                    <button type="submit" class="save-expense-btn" style="flex: 1; margin: 0;">
+                        ADD-EXPENSE
                     </button>
-
-
-                    <a href="/"
-                       class="cancel-expense-btn">
-                        CANCEL
+                    <a href="/" class="cancel-expense-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--borders); border-radius: var(--r-sm); color: var(--primary-text); font-weight: 600; text-decoration: none; background: transparent;">
+                        Cancel
                     </a>
-
                 </div>
 
             </form>
-
         </div>
-
     </div>
 
-
-    <!-- FLASH SCRIPT -->
-
     <script>
-
         function closeFlash(button) {
-
-            const message =
-                button.closest(".flash-message");
-
+            const message = button.closest(".flash-message");
             if (message) {
-
-                message.style.animation =
-                    "flashOut 0.3s ease forwards";
-
-                setTimeout(() => {
-
-                    message.remove();
-
-                }, 300);
-
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 300);
             }
-
         }
 
+        document.querySelectorAll(".flash-message").forEach(message => {
+            setTimeout(() => {
+                if (message.isConnected) {
+                    message.style.opacity = "0";
+                    setTimeout(() => message.remove(), 300);
+                }
+            }, 4000);
+        });
 
-        document
-            .querySelectorAll(".flash-message")
-            .forEach(message => {
-
-                setTimeout(() => {
-
-                    if (message.isConnected) {
-
-                        message.style.animation =
-                            "flashOut 0.3s ease forwards";
-
-                        setTimeout(() => {
-
-                            message.remove();
-
-                        }, 300);
-
-                    }
-
-                }, 4000);
-
-            });
-
+        // Set today's date by default if empty
+        const dateInput = document.getElementById("date");
+        if (dateInput && !dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
     </script>
-
 </body>
-
 </html>
