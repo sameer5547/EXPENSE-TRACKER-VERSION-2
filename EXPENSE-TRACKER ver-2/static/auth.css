@@ -1,498 +1,156 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap");
-
-/* ==========================================================
-   Expense Tracker: login and sign-up pages
-   Works with your current markup: h1, form, p.
-   Load this file INSTEAD of style.css on these two pages.
-   ========================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
-    --bg: #edf2ee;
-    --surface: #ffffff;
-    --tint: #f3f7f4;
-    --field: #f6f9f7;
-    --ink: #10241c;
-    --muted: #5b6f66;
-    --line: #d5e0d9;
-
-    --brand: #1b6b4f;
-    --brand-strong: #124a37;
-    --on-brand: #ffffff;
-    --marigold: #f4b63f;
-    --on-marigold: #10241c;
-    --danger: #b93a2b;
-
-    /* The accent changes on the sign-up page (see the :has rule below) */
-    --accent: var(--brand);
-    --accent-strong: var(--brand-strong);
-    --on-accent: var(--on-brand);
-
-    --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-    --font-body: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --bg: #F7FBF9;
+  --surface: #FFFFFF;
+  --text: #0E2218;
+  --muted: #627F70;
+  --line: #E6F0EB;
+  --side: #FFFFFF;
+  --accent: #1F8A5B;
+  --accent-ink: #FFFFFF;
+  --brand: #1F8A5B;
+  --brand-strong: #177348;
+  --tint: #EEF7F2;
+  --bad: #D4503F;
+  --ok: #1F8A5B;
+  --r: 20px;
+  --shadow: 0 12px 40px rgba(31, 138, 91, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #0c1713;
-        --surface: #14241d;
-        --tint: #101e18;
-        --field: #0f1d17;
-        --ink: #e8f1ec;
-        --muted: #93a89e;
-        --line: #26392f;
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
 
-        --brand: #3fb88a;
-        --brand-strong: #5ccfa2;
-        --on-brand: #06130e;
-        --danger: #f08a7a;
-    }
-}
-
-/* Sign-up page: marigold accent (browsers that support :has) */
-body:has(form[action="/signup"]) {
-    --accent: var(--marigold);
-    --accent-strong: #e9a421;
-    --on-accent: var(--on-marigold);
-}
-
-/* ==========================================================
-   Page
-   ========================================================== */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-html {
-    -webkit-text-size-adjust: 100%;
-}
+html { background: var(--bg); -webkit-text-size-adjust: 100%; }
 
 body {
-    margin: 0;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(1rem, 5vw, 2.5rem);
-
-    /* h1, form and p stack into one card, centred on the page */
-    display: grid;
-    grid-template-columns: minmax(0, 430px);
-    grid-auto-rows: min-content;
-    justify-content: center;
-    align-content: center;
-
-    background:
-        radial-gradient(50rem 26rem at 50% -8%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 70%),
-        var(--bg);
-    background-attachment: fixed;
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.55;
+  font: 15px/1.6 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: linear-gradient(140deg, #F3FBF6 0%, #FAFCFB 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ==========================================================
-   Card top: logo badge and title
-   ========================================================== */
-h1 {
-    margin: 0;
-    padding:
-        calc(2rem + 52px + 1.1rem)
-        2rem
-        0.4rem;
+h1, h2 { margin: 0; letter-spacing: -0.02em; line-height: 1.15; color: var(--text); }
+h1 { font-size: 26px; font-weight: 700; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
 
-    background-color: var(--surface);
-    /* Small rupee badge drawn as an inline SVG */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52'%3E%3Crect width='52' height='52' rx='15' fill='%23f4b63f'/%3E%3Ctext x='26' y='37' font-size='30' font-weight='800' text-anchor='middle' fill='%2310241c' font-family='Segoe UI,Arial,sans-serif'%3E%E2%82%B9%3C/text%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 2rem 2rem;
+a { color: var(--brand); font-weight: 600; text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-    border: 1px solid var(--line);
-    border-top: 5px solid var(--accent);
-    border-bottom: 0;
-    border-radius: 22px 22px 0 0;
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
-    font-family: var(--font-display);
-    font-size: clamp(1.7rem, 6vw, 2.1rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-
-    /* The HTML is written in capitals; show it as "Login" / "Create account" */
-}
-h1::first-letter {
-    text-transform: uppercase;
-}
-
-/* ==========================================================
-   Card middle: form
-   ========================================================== */
-form {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0.9rem 2rem 2rem;
-    background: var(--surface);
-    border: solid var(--line);
-    border-width: 0 1px;
-}
-
-form br {
-    display: none;
-}
-
-label {
-    display: block;
-    margin: 1.1rem 0 0.4rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-label:first-of-type {
-    margin-top: 0;
-}
-
-input {
-    width: 100%;
-    min-height: 48px;
-    padding: 0.7rem 0.95rem;
-    background: var(--field);
-    color: var(--ink);
-    border: 1.5px solid var(--line);
-    border-radius: 11px;
-    font-family: inherit;
-    font-size: 1rem; /* 16px stops iOS zooming into the field */
-    transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
-}
-
-input:hover {
-    border-color: color-mix(in srgb, var(--brand) 55%, var(--line));
-}
-
-input:focus {
-    outline: none;
-    background: var(--surface);
-    border-color: var(--brand);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 22%, transparent);
-}
-
-/* Live feedback once the person has typed (modern browsers) */
-input:user-invalid {
-    border-color: var(--danger);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 18%, transparent);
-}
-
-input:user-valid {
-    border-color: color-mix(in srgb, var(--brand) 70%, var(--line));
-}
-
-/* Keep browser autofill from painting a yellow or blue box */
-input:-webkit-autofill,
-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--ink);
-    box-shadow: 0 0 0 100px var(--field) inset;
-    transition: background-color 9999s;
-}
-
-/* ==========================================================
-   Button
-   ========================================================== */
 button {
-    width: 100%;
-    min-height: 50px;
-    margin-top: 1.75rem;
-    padding: 0.75rem 1rem;
-    background: var(--accent);
-    color: var(--on-accent);
-    border: 2px solid var(--accent);
-    border-radius: 11px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    transition:
-        background-color 0.18s,
-        border-color 0.18s,
-        transform 0.15s,
-        box-shadow 0.18s;
-}
-
-button:hover {
-    background: var(--accent-strong);
-    border-color: var(--accent-strong);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 38%, transparent);
-}
-
-button:active {
-    transform: translateY(0) scale(0.985);
-    box-shadow: none;
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* ==========================================================
-   Card bottom: switch between login and sign up
-   ========================================================== */
-p {
-    margin: 0;
-    padding: 1.3rem 2rem 1.5rem;
-    background: var(--tint);
-    border: 1px solid var(--line);
-    border-top-color: var(--line);
-    border-radius: 0 0 22px 22px;
-    color: var(--muted);
-    font-size: 0.95rem;
-    text-align: center;
-}
-
-a {
-    color: var(--brand);
-    font-weight: 700;
-    text-decoration: none;
-    /* Underline that grows in on hover */
-    background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
-    padding-bottom: 2px;
-    transition: background-size 0.25s ease, color 0.15s;
-}
-
-a:hover {
-    color: var(--brand-strong);
-    background-size: 100% 2px;
-}
-
-/* ==========================================================
-   Entrance animation
-   ========================================================== */
-@keyframes rise {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: none; }
-}
-
-h1 { animation: rise 0.5s ease both; }
-form { animation: rise 0.5s 0.08s ease both; }
-p { animation: rise 0.5s 0.16s ease both; }
-
-/* ==========================================================
-   Accessibility and small screens
-   ========================================================== */
-:focus-visible {
-    outline: 3px solid var(--marigold);
-    outline-offset: 2px;
-}
-
-input:focus-visible {
-    outline: none;
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 0.75rem;
-        align-content: start;
-    }
-
-    h1 {
-        padding: calc(1.5rem + 52px + 1rem) 1.4rem 0.4rem;
-        background-position: 1.4rem 1.5rem;
-    }
-
-    form {
-        padding: 0.8rem 1.4rem 1.6rem;
-    }
-
-    p {
-        padding: 1.1rem 1.4rem 1.3rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation: none !important;
-        transition: none !important;
-    }
-
-    button:hover {
-        transform: none;
-    }
-}
-/* ==========================================================
-   Flash messages (works with plain <p>, <li> or a wrapper)
-   ========================================================== */
-.flash,
-.flashes li {
-    list-style: none;
-    margin: 0 0 0.9rem;
-    padding: 0.8rem 1.1rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 4px solid var(--brand);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow);
-    font-weight: 500;
-}
-
-.flashes {
-    margin: 0;
-    padding: 0;
-}
-/* ==============================
-   FORGOT PASSWORD PAGE
-============================== */
-
-.reset-card {
-    width: min(420px, calc(100% - 40px));
-    margin: 60px auto;
-    padding: 35px;
-    box-sizing: border-box;
-
-    background: #111827;
-    color: #f9fafb;
-
-    border: 1px solid #334155;
-    border-radius: 18px;
-
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-}
-
-.reset-card h1 {
-    margin-top: 0;
-    margin-bottom: 15px;
-
-    text-align: center;
-    font-size: 28px;
-}
-
-.reset-description {
-    margin-bottom: 25px;
-
-    color: #cbd5e1;
-    font-size: 14px;
-    line-height: 1.7;
-    text-align: center;
-}
-
-.reset-card .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-
-    margin-bottom: 22px;
-}
-
-.reset-card label {
-    color: #e2e8f0;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.reset-card input[type="email"] {
-    width: 100%;
-    padding: 13px 14px;
-    box-sizing: border-box;
-
-    color: #f8fafc;
-    background: #1e293b;
-
-    border: 1px solid #475569;
-    border-radius: 9px;
-
-    outline: none;
-    font-size: 14px;
-
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.reset-card input[type="email"]:focus {
-    border-color: #818cf8;
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
-}
-
-.reset-card .reset-button {
-    width: 100%;
-    padding: 13px;
-
-    color: #ffffff;
-    background: #6366f1;
-
-    border: none;
-    border-radius: 9px;
-
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-
-    transition: background 0.2s, transform 0.2s;
-}
-
-.reset-card .reset-button:hover {
-    background: #4f46e5;
-    transform: translateY(-1px);
-}
-
-.reset-card .back-to-login {
-    margin-top: 24px;
-    margin-bottom: 0;
-
-    text-align: center;
-    color: #cbd5e1;
-    font-size: 13px;
-    line-height: 1.8;
-}
-
-.reset-card .back-to-login a {
-    color: #a5b4fc;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.reset-card .back-to-login a:hover {
-    color: #c7d2fe;
-    text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-    .reset-card {
-        margin: 30px auto;
-        padding: 25px 20px;
-    }
-
-    .reset-card h1 {
-        font-size: 24px;
-    }
-}
-.password-wrapper {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-}
-
-.password-wrapper input {
-  width: 100%;
-  padding-right: 45px; /* room for the eye */
-  box-sizing: border-box;
-}
-
-.password-wrapper .toggle-eye {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: auto;
-  height: auto;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #2CD485 0%, #177348 100%);
+  color: #fff;
+  font: 600 14px/1 'Plus Jakarta Sans', system-ui, sans-serif;
   cursor: pointer;
-  font-size: 18px;
-  color: #7fffd4;
+  box-shadow: 0 6px 16px rgba(31, 138, 91, 0.2);
+  transition: all 0.2s ease;
+  margin-top: 16px;
 }
+button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+input, select {
+  width: 100%;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0 16px;
+  color: var(--text);
+  font: inherit;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+  transition: all 0.2s ease;
+}
+input::placeholder { color: var(--muted); opacity: 0.8; }
+input:hover, select:hover { border-color: var(--brand); }
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(31, 138, 91, 0.1);
+}
+
+label { display: block; margin: 0 0 6px; color: var(--text); font-size: 13px; font-weight: 600; }
+
+/* Auth card containers */
+body:has(> form[action="/login"]),
+body:has(> form[action="/signup"]),
+.card, .forgot-password-container, .add-expense-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 36px;
+}
+
+body:has(> form[action="/login"]) > h1,
+body:has(> form[action="/signup"]) > h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+body:has(> form[action="/login"]) > form,
+body:has(> form[action="/signup"]) > form {
+  display: grid;
+  gap: 16px;
+}
+
+body:has(> form[action="/login"]) > p,
+body:has(> form[action="/signup"]) > p {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field, .form-group { margin-bottom: 16px; }
+.form-subtitle, .forgot-password-container .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+.form-buttons { display: flex; gap: 10px; margin-top: 20px; }
+.form-buttons > * { flex: 1; margin: 0; }
+.cancel-expense-btn {
+  display: inline-flex; align-items: center; justify-content: center; height: 44px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); color: var(--text); font-weight: 600; text-decoration: none;
+}
+.cancel-expense-btn:hover { background: var(--tint); border-color: var(--brand); }
+.back-link, .back-login { display: block; margin-top: 16px; color: var(--brand); text-align: center; font-size: 13px; font-weight: 600; }
+
+/* Password show/hide */
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 40px; }
+.password-wrapper .toggle-eye {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  width: 32px; height: 32px; margin: 0; padding: 0;
+  background: transparent; color: var(--muted); border: 0; font-size: 14px; box-shadow: none;
+}
+.password-wrapper .toggle-eye:hover { background: var(--tint); color: var(--text); transform: translateY(-50%); }
+
+/* Notifications / Toasts */
+#flash-container {
+  position: fixed; top: 24px; right: 24px; display: grid; gap: 12px; z-index: 100; width: min(380px, calc(100% - 32px)); pointer-events: none;
+}
+.flash-message, .reset-toast {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand);
+  border-radius: 14px; padding: 16px 20px; box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+  font-size: 14px; color: var(--text); pointer-events: auto; animation: in .3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.flash-message.error, .reset-toast.error { border-left-color: var(--bad); }
+.flash-close, .toast-close {
+  background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--muted); margin-left: auto; width: auto; height: auto; box-shadow: none; padding: 0;
+}
+@keyframes in { from { opacity: 0; transform: translateY(-12px) scale(0.98); } }
