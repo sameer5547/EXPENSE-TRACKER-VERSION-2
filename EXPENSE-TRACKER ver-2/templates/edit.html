@@ -2,6 +2,8 @@
 <html>
 <head>
     <body>
+       <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
         <div id="flash-container">
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -30,106 +32,6 @@
 
 </div>
     <title>EDIT </title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #000101 0%, #28dfa5 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .card {
-            background: #130808;
-            width: 100%;
-            max-width: 420px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            padding: 32px 28px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #c0c0d8;
-            font-size: 24px;
-            margin-bottom: 24px;
-        }
-
-        .field {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            font-size: 15px;
-            border: 1px solid #d8d8e0;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input[type="number"]:focus,
-        input[type="text"]:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.15);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 8px;
-            background: linear-gradient(135deg, #11141f 0%, #06cb44 100%);
-            color: #fff;
-            font-size: 15px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        button:hover {
-            opacity: 0.92;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 18px;
-            color: #764ba2;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 
     <div class="card">
