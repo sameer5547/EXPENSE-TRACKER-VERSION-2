@@ -46,12 +46,21 @@
 </aside>
 
 <main>
-  <header class="top">
-    <h1><span id="hello">Welcome</span><small id="today"></small></h1>
-    <select id="currencySelect" class="ctl" aria-label="Currency">
-      <option value="INR">INR · Rupee</option><option value="USD">USD · Dollar</option><option value="EUR">EUR · Euro</option>
-      <option value="GBP">GBP · Pound</option><option value="AED">AED · Dirham</option><option value="CAD">CAD · Canadian dollar</option><option value="AUD">AUD · Australian dollar</option><option value="JPY">JPY · Yen</option>
-    </select>
+  <header class="top dashboard-heading">
+    <div class="dashboard-title">
+      <h1><span id="hello">Welcome</span><small id="today"></small></h1>
+      <p class="dashboard-subtitle">Your spending at a glance. Make every rupee count.</p>
+    </div>
+
+    <div class="dashboard-actions">
+      <div class="currency-control">
+        <h3 label for="currencySelect"> select currency</label></h3>
+        <select id="currencySelect" class="ctl" aria-label="Currency">
+          <option value="INR">INR · Rupee</option><option value="USD">USD · Dollar</option><option value="EUR">EUR · Euro</option>
+          <option value="GBP">GBP · Pound</option><option value="AED">AED · Dirham</option><option value="CAD">CAD · Canadian dollar</option><option value="AUD">AUD · Australian dollar</option><option value="JPY">JPY · Yen</option>
+        </select>
+      </div>
+    </div>
   </header>
 
   <section class="hero" aria-label="Summary">
@@ -83,7 +92,7 @@
   <section class="panel" aria-label="Expenses">
     <h2>All expenses</h2>
     <div class="tools">
-      <input id="searchInput" class="ctl" type="search" placeholder="Search description" aria-label="Search description">
+      <input id="searchInput" class="ctl" type="search" placeholder="Search description (press /)" aria-label="Search description">
       <select id="categoryFilter" class="ctl" aria-label="Category"><option value="">All categories</option></select>
       <span class="dates"><input id="fromDate" class="ctl" type="date" aria-label="From date">to<input id="toDate" class="ctl" type="date" aria-label="To date"></span>
       <button id="clearFilters" class="btn" type="button">Clear</button>
