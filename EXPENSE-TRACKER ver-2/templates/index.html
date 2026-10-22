@@ -1,547 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Expense Tracker</title>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- CSS -->
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Expense Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+<body data-user="{{ session.get('user_name', 'User') }}">
 
+<div id="toasts">
+{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}
+<div class="toast {{ category }}" role="status"><span>{{ message }}</span><button type="button" aria-label="Dismiss" onclick="closeFlash(this)">×</button></div>
+{% endfor %}{% endwith %}
+</div>
 
-<body>
-
-    <!-- =====================================================
-         FLASH MESSAGES
-    ====================================================== -->
-
-    <div id="flash-container">
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-
-            {% for category, message in messages %}
-
-                <div class="flash-message {{ category }}">
-
-                    <span>{{ message }}</span>
-
-                    <button type="button"
-                            onclick="closeFlash(this)">
-                        ×
-                    </button>
-
-                </div>
-
-            {% endfor %}
-
-        {% endwith %}
-
+<aside class="side" tabindex="0">
+  <div class="brand">
+    <span class="mark">₹</span>
+    <span class="brand-text">Expense Tracker</span>
+  </div>
+  <nav aria-label="Main">
+    <a class="on" href="#" aria-current="page">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="nav-text">Dashboard</span>
+    </a>
+    <a href="/add">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg>
+      <span class="nav-text">Add expense</span>
+    </a>
+  </nav>
+  <div class="side-foot">
+    <div class="me">
+      <span class="av" id="av"></span>
+      <span class="me-text" id="uname"></span>
     </div>
+    <a href="/logout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      <span class="foot-text">Log out</span>
+    </a>
+  </div>
+</aside>
 
+<main>
+  <header class="top">
+    <h1><span id="hello">Welcome</span><small id="today"></small></h1>
+    <select id="currencySelect" class="ctl" aria-label="Currency">
+      <option value="INR">INR · Rupee</option><option value="USD">USD · Dollar</option><option value="EUR">EUR · Euro</option>
+      <option value="GBP">GBP · Pound</option><option value="AED">AED · Dirham</option><option value="CAD">CAD · Canadian dollar</option><option value="AUD">AUD · Australian dollar</option><option value="JPY">JPY · Yen</option>
+    </select>
+  </header>
 
-    <!-- =====================================================
-         PAGE TITLE
-    ====================================================== -->
-
-    <h1 style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">EXPENSE TRACKER</h1>
-
-    <h2>
-        WELCOME {{ session.get("user_name", "User") }} 👋
-    </h2>
-
-
-    <!-- =====================================================
-         DASHBOARD
-    ====================================================== -->
-
-    <h2>DASHBOARD</h2>
-
-    <div class="dashboard-stats">
-
-        <p>
-            TOTAL SPENDING
-            <span id="totalSpending">₹0.00</span>
-        </p>
-
-        <p>
-            THIS MONTH
-            <span id="thisMonthSpending">₹0.00</span>
-        </p>
-
-        <p>
-            AVERAGE SPENDING
-            <span id="averageExpense">₹0.00</span>
-        </p>
-
-        <p>
-            HIGHEST SPENDING
-            <span id="highestExpense">₹0.00</span>
-        </p>
-
-        <p>
-            NUMBER OF EXPENSES
-            <span id="numberOfExpenses">0</span>
-        </p>
-
+  <section class="hero" aria-label="Summary">
+    <div class="hero-l">
+      <div class="lbl">Spent this month</div>
+      <div class="big" id="heroAmt">₹0.00</div>
+      <div class="delta" id="delta"></div>
+      <div class="bud">
+        <div class="bud-row"><span id="budTxt">No monthly budget set</span><button type="button" id="budBtn">Set budget</button></div>
+        <div class="bar" role="progressbar" aria-label="Budget used" aria-valuemin="0" aria-valuemax="100" id="budBar"><i id="budFill"></i></div>
+      </div>
+      <p class="tip" id="tip"></p>
     </div>
+    <dl class="hero-r">
+      <div class="stat"><dt>Total spending</dt><dd id="totalSpending">₹0.00</dd></div>
+      <div class="stat"><dt>Number of expenses</dt><dd id="numberOfExpenses">0</dd></div>
+      <div class="stat"><dt>Average expense</dt><dd id="averageExpense">₹0.00</dd></div>
+      <div class="stat"><dt>Highest expense</dt><dd id="highestExpense">₹0.00</dd></div>
+    </dl>
+  </section>
 
+  <div class="grid">
+    <section class="panel"><h2>Monthly trend</h2><p class="sub">Last 6 months</p><div class="cv"><canvas id="trendChart"></canvas></div></section>
+    <section class="panel"><h2>Spending by category</h2><p class="sub">Share of total spending</p>
+      <div class="cat-wrap"><div class="cv"><canvas id="categoryChart"></canvas></div><ul class="legend" id="legend"></ul></div>
+    </section>
+  </div>
 
-    <!-- =====================================================
-         CURRENCY
-    ====================================================== -->
-
-    <select id="currencySelect">
-    <option value="INR">INR - Indian Rupee</option>
-    <option value="USD">USD - US Dollar</option>
-    <option value="EUR">EUR - Euro</option>
-    <option value="GBP">GBP - British Pound</option>
-    <option value="AED">AED - UAE Dirham</option>
-    <option value="CAD">CAD - Canadian Dollar</option>
-    <option value="AUD">AUD - Australian Dollar</option>
-    <option value="JPY">JPY - Japanese Yen</option>
-</select>
-
-
-    <!-- =====================================================
-         EXPENSES BY CATEGORY
-    ====================================================== -->
-
-    <h2>EXPENSES BY CATEGORY</h2>
-
-    <div id="categoryList">
-
-        {% for category, amount in category_totals.items() %}
-
-            <p>
-
-                {{ category }}
-
-                <span class="category-amount"
-                      data-inr="{{ amount }}">
-
-                    ₹{{ "%.2f"|format(amount|float) }}
-
-                </span>
-
-            </p>
-
+  <section class="panel" aria-label="Expenses">
+    <h2>All expenses</h2>
+    <div class="tools">
+      <input id="searchInput" class="ctl" type="search" placeholder="Search description (press /)" aria-label="Search description">
+      <select id="categoryFilter" class="ctl" aria-label="Category"><option value="">All categories</option></select>
+      <span class="dates"><input id="fromDate" class="ctl" type="date" aria-label="From date">to<input id="toDate" class="ctl" type="date" aria-label="To date"></span>
+      <button id="clearFilters" class="btn" type="button">Clear</button>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th aria-sort="descending" data-k="date"><button type="button">Date</button></th>
+          <th data-k="category"><button type="button">Category</button></th>
+          <th data-k="d"><button type="button">Description</button></th>
+          <th class="r" data-k="amt"><button type="button">Amount</button></th>
+          <th class="r"><span class="sr" style="font-weight:600">Actions</span></th>
+        </tr></thead>
+        <tbody id="tbody">
+        {% for e in expenses %}
+          <tr class="row" data-d="{{ e['description']|lower }}" data-label="{{ e['description'] }}" data-category="{{ e['category']|lower }}" data-date="{{ e['date'] }}" data-amount="{{ e['amount'] }}">
+            <td class="dt">{{ e['date'] }}</td>
+            <td><span class="chip"><i></i>{{ e['category']|title }}</span></td>
+            <td>{{ e['description'] }}</td>
+            <td class="r amt"><span class="expense-amount" data-inr="{{ e['amount'] }}">₹{{ "%.2f"|format(e['amount']|float) }}</span></td>
+            <td><div class="acts">
+              <a class="ib" href="/edit/{{ e['id'] }}" aria-label="Edit {{ e['description'] }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></a>
+              <a class="ib del" href="/delete/{{ e['id'] }}" aria-label="Delete {{ e['description'] }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></a>
+            </div></td>
+          </tr>
         {% endfor %}
-
+        </tbody>
+      </table>
     </div>
-
-
-    <!-- =====================================================
-         CHART
-    ====================================================== -->
-
-    <h2>SPENDING BY CATEGORY</h2>
-
-    <div class="chart-container">
-
-        <canvas id="categoryChart"></canvas>
-
+    <div class="empty" id="empty" hidden></div>
+    <div class="pager"><span id="pageInfo"></span>
+      <div><label>Rows <select id="perPage" class="ctl" style="height:38px"><option>10</option><option>25</option><option>50</option></select></label>
+      <button class="btn" id="prev" type="button">Previous</button><button class="btn" id="next" type="button">Next</button></div>
     </div>
+  </section>
+</main>
 
+<dialog id="delDlg"><h3>Delete this expense?</h3><p id="delMsg"></p>
+  <div class="dlg-act"><button class="btn" id="delNo" type="button">Cancel</button><a class="btn danger" id="delYes" href="#">Delete expense</a></div>
+</dialog>
+<dialog id="budDlg"><h3>Monthly budget</h3><p>Set the amount you want to stay under each month (in INR). Leave it empty to remove the budget.</p>
+  <input id="budInput" type="number" min="0" step="100" placeholder="e.g. 20000">
+  <div class="dlg-act"><button class="btn" id="budNo" type="button">Cancel</button><button class="btn pri" id="budSave" type="button">Save budget</button></div>
+</dialog>
 
-    <!-- =====================================================
-         SEARCH & FILTER
-    ====================================================== -->
+{% raw %}
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function closeFlash(b){const m=b.closest(".toast");if(m){m.style.animation="flashOut .3s ease forwards";setTimeout(()=>m.remove(),300)}}
+$$(".toast").forEach(m=>setTimeout(()=>m.isConnected&&closeFlash(m.querySelector("button")),4500));
+const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
 
-    <h2>SEARCH & FILTER</h2>
+/* user + header info */
+const user=document.body.dataset.user;
+$("#uname").textContent=user;$("#av").textContent=user.trim().charAt(0).toUpperCase();
+const hr=new Date().getHours();
+$("#hello").textContent=(hr<12?"Good morning":hr<17?"Good afternoon":"Good evening")+", "+user.split(" ")[0];
+$("#today").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 
-    <div class="filter-container">
+/* data from the rendered rows */
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const rows=$$("#tbody tr.row").map(tr=>({tr,d:tr.dataset.d,c:tr.dataset.category,date:tr.dataset.date,amt:Number(tr.dataset.amount)||0,label:tr.dataset.label}));
+const PAL=["#1F8A5B","#2CD485","#0B5D3B","#56C695","#3E7C64","#86E2B7","#2E9E7A","#4EB387"];
+const cats=[...new Set(rows.map(r=>r.c))].sort();
+const color=c=>PAL[cats.indexOf(c)%PAL.length];
+const title=s=>s.charAt(0).toUpperCase()+s.slice(1);
+rows.forEach(r=>{r.tr.querySelector(".chip i").style.background=color(r.c);const p=r.date.split("-");if(p.length===3)r.tr.querySelector(".dt").textContent=+p[2]+" "+MON[p[1]-1]+" "+p[0]});
+cats.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=title(c);$("#categoryFilter").appendChild(o)});
 
-        <!-- Search -->
-        <input
-            id="searchInput"
-            type="text"
-            placeholder="Search by description"
-        >
+let cur="INR",rate=1,budget=Number(store.get("et_budget"))||0,sort={k:"date",dir:-1},page=1,first=true;
+const SYM={INR:"₹",USD:"$",EUR:"€",GBP:"£",AED:"AED ",CAD:"C$",AUD:"A$",JPY:"¥"};
+const conv=v=>cur==="INR"?v:v*rate;
+const fmt=v=>(SYM[cur]||cur+" ")+(Number(v)||0).toLocaleString(cur==="INR"?"en-IN":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=v=>fmt(conv(v));
+const ym=d=>d.slice(0,7);
+const now=new Date(),key=(y,m)=>y+"-"+String(m+1).padStart(2,"0");
+const thisKey=key(now.getFullYear(),now.getMonth());
+const prev=new Date(now.getFullYear(),now.getMonth()-1,1),prevKey=key(prev.getFullYear(),prev.getMonth());
 
-
-        <!-- Category -->
-        <select id="categoryFilter">
-
-            <option value="">
-                All Categories
-            </option>
-
-        </select>
-
-
-        <!-- Date -->
-        <input
-            type="date"
-            id="dateFilter"
-        >
-
-
-        <!-- Sort -->
-        <select id="sortFilter">
-
-            <option value="">
-                Sort By
-            </option>
-
-            <option value="amount_asc">
-                Amount: Low to High
-            </option>
-
-            <option value="amount_desc">
-                Amount: High to Low
-            </option>
-
-            <option value="date_asc">
-                Date: Oldest First
-            </option>
-
-            <option value="date_desc">
-                Date: Newest First
-            </option>
-
-        </select>
-
-
-        <!-- Clear -->
-        <button
-            id="clearFilters"
-            type="button"
-        >
-            Clear
-        </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         ALL EXPENSES
-    ====================================================== -->
-
-    <h2>ALL EXPENSES</h2>
-
-    <div id="expenseList">
-
-        {% if expenses %}
-
-            {% for e in expenses %}
-
-                <p
-                    class="expense-item"
-                    data-description="{{ e['description']|lower }}"
-                    data-category="{{ e['category']|lower }}"
-                    data-date="{{ e['date'] }}"
-                    data-amount="{{ e['amount'] }}"
-                >
-
-                    <span
-                        class="expense-amount"
-                        data-inr="{{ e['amount'] }}"
-                    >
-                        ₹{{ "%.2f"|format(e['amount']|float) }}
-                    </span>
-
-                    |
-
-                    CATEGORY:
-                    {{ e['category'] }}
-
-                    |
-
-                    DESCRIPTION:
-                    {{ e['description'] }}
-
-                    |
-
-                    DATE:
-                    {{ e['date'] }}
-
-                    <a href="/delete/{{ e['id'] }}">
-                        delete
-                    </a>
-
-                    <a href="/edit/{{ e['id'] }}">
-                        edit
-                    </a>
-
-                </p>
-
-            {% endfor %}
-
-        {% else %}
-
-            <p>
-                No expenses found.
-            </p>
-
-        {% endif %}
-
-    </div>
-    
-
-<a href="/add" class="add-expense-link">
-    <button type="button">
-    + ADD EXPENSE
-</button>
-</a>
-
-<div class="dashboard-stats">
-
-    <!-- =====================================================
-         LOGOUT
-    ====================================================== -->
-
-    <div class="logout-wrap">
-
-        <a href="/logout">
-
-            <button type="button">
-                LOGOUT
-            </button>
-
-        </a>
-
-    </div>
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
-
-    <script>
-function closeFlash(button) {
-    const message = button.closest(".flash-message");
-    if (message) {
-        message.style.animation = "flashOut 0.3s ease forwards";
-        setTimeout(() => message.remove(), 300);
-    }
+function summary(){
+  const total=rows.reduce((s,r)=>s+r.amt,0),n=rows.length;
+  const month=rows.filter(r=>ym(r.date)===thisKey).reduce((s,r)=>s+r.amt,0);
+  const last=rows.filter(r=>ym(r.date)===prevKey).reduce((s,r)=>s+r.amt,0);
+  const byCat={};rows.forEach(r=>byCat[r.c]=(byCat[r.c]||0)+r.amt);
+  return{total,n,month,last,avg:n?total/n:0,max:n?Math.max(...rows.map(r=>r.amt)):0,byCat};
 }
-document.querySelectorAll(".flash-message").forEach(message => {
-    setTimeout(() => {
-        if (message.isConnected) {
-            message.style.animation = "flashOut 0.3s ease forwards";
-            setTimeout(() => message.remove(), 300);
-        }
-    }, 4000);
+let S=summary();
+
+function countUp(el,to){
+  if(!first||matchMedia("(prefers-reduced-motion:reduce)").matches){el.textContent=money(to);return}
+  const t0=performance.now();(function f(t){const p=Math.min((t-t0)/900,1);el.textContent=money(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0);
+}
+
+function paintSummary(){
+  countUp($("#heroAmt"),S.month);
+  $("#totalSpending").textContent=money(S.total);$("#averageExpense").textContent=money(S.avg);
+  $("#highestExpense").textContent=money(S.max);$("#numberOfExpenses").textContent=S.n;
+  const d=$("#delta");
+  if(S.last>0){const pc=Math.round((S.month-S.last)/S.last*100);d.className="delta "+(pc>0?"up":"down");d.textContent=(pc>0?"▲ ":"▼ ")+Math.abs(pc)+"% "+(pc>0?"more":"less")+" than last month ("+money(S.last)+")"}
+  else{d.className="delta";d.textContent=S.month?"No spending recorded last month to compare with.":"Nothing spent yet this month."}
+  const pct=budget?S.month/budget*100:0,fill=$("#budFill");
+  fill.style.width=Math.min(pct,100)+"%";fill.style.background=pct>100?"var(--bad)":pct>80?"#D69E2E":"var(--brand)";
+  $("#budBar").setAttribute("aria-valuenow",Math.round(pct));
+  $("#budTxt").textContent=budget?(pct>100?money(S.month-budget)+" over your "+money(budget)+" budget":money(budget-S.month)+" left of your "+money(budget)+" budget"):"No monthly budget set";
+  $("#budBtn").textContent=budget?"Change budget":"Set budget";
+  const top=Object.entries(S.byCat).sort((a,b)=>b[1]-a[1])[0],day=now.getDate();
+  $("#tip").textContent=top?title(top[0])+" is your biggest category at "+Math.round(top[1]/S.total*100)+"% of all spending. You're averaging "+money(S.month/day)+" a day this month.":"Add your first expense to see insights here.";
+}
+
+/* charts */
+let trend,donut;
+function drawCharts(){
+  const muted="#627F70",line="#E6F0EB",surf="#FFFFFF";
+  Chart.defaults.color=muted;Chart.defaults.font.family="'Plus Jakarta Sans',system-ui,sans-serif";
+  trend&&trend.destroy();donut&&donut.destroy();
+  const ms=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push({k:key(d.getFullYear(),d.getMonth()),l:MON[d.getMonth()]})}
+  const vals=ms.map(m=>conv(rows.filter(r=>ym(r.date)===m.k).reduce((s,r)=>s+r.amt,0)));
+  const ds=[{type:"bar",label:"Spending",data:vals,borderRadius:8,maxBarThickness:40,backgroundColor:ms.map(m=>m.k===thisKey?"#1F8A5B":"#D5F2E2")}];
+  if(budget)ds.push({type:"line",label:"Budget",data:ms.map(()=>conv(budget)),borderColor:"#D4503F",borderDash:[6,5],pointRadius:0,borderWidth:2});
+  trend=new Chart($("#trendChart"),{data:{labels:ms.map(m=>m.l),datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:!!budget,position:"bottom"},tooltip:{callbacks:{label:c=>c.dataset.label+": "+fmt(c.raw)}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:line},border:{display:false},ticks:{callback:v=>(SYM[cur]||"")+Number(v).toLocaleString("en-US",{notation:"compact"})}}}}});
+  const ents=Object.entries(S.byCat).sort((a,b)=>b[1]-a[1]);
+  donut=new Chart($("#categoryChart"),{type:"doughnut",data:{labels:ents.map(e=>title(e[0])),datasets:[{data:ents.map(e=>conv(e[1])),backgroundColor:ents.map(e=>color(e[0])),borderColor:surf,borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:"70%",plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+": "+fmt(c.raw)}}}}});
+  $("#legend").innerHTML=ents.length?"":"<li>No spending yet.</li>";
+  ents.forEach(e=>{const li=document.createElement("li"),p=Math.round(e[1]/S.total*100);
+    li.innerHTML='<i style="background:'+color(e[0])+'"></i><span></span><span>'+money(e[1])+'</span><small>'+p+'% of total</small>';
+    li.children[1].textContent=title(e[0]);$("#legend").appendChild(li)});
+}
+
+/* table: filter, sort, paginate */
+const f={q:$("#searchInput"),c:$("#categoryFilter"),from:$("#fromDate"),to:$("#toDate")};
+const per=()=>Number($("#perPage").value);
+function filtered(){
+  const q=f.q.value.toLowerCase().trim();
+  return rows.filter(r=>(!q||r.d.includes(q))&&(!f.c.value||r.c===f.c.value)&&(!f.from.value||r.date>=f.from.value)&&(!f.to.value||r.date<=f.to.value));
+}
+function renderTable(){
+  const list=filtered().sort((a,b)=>{const x=a[sort.k],y=b[sort.k];return(x>y?1:x<y?-1:0)*sort.dir});
+  const pages=Math.max(1,Math.ceil(list.length/per()));page=Math.min(page,pages);
+  const start=(page-1)*per(),show=new Set(list.slice(start,start+per()));
+  rows.forEach(r=>r.tr.hidden=true);
+  list.forEach(r=>{$("#tbody").appendChild(r.tr);r.tr.hidden=!show.has(r)});
+  const e=$("#empty");e.hidden=list.length>0;
+  if(!list.length)e.innerHTML=rows.length?'<strong>No expenses match these filters</strong>Try a different search or date range.<br><button class="btn" type="button" id="emptyClear">Clear filters</button>':'<strong>No expenses yet</strong>Add your first expense to start tracking your spending.<br><a class="btn pri" href="/add">+ Add expense</a>';
+  const ec=$("#emptyClear");if(ec)ec.onclick=clearAll;
+  $("#pageInfo").textContent=list.length?"Showing "+(start+1)+"–"+Math.min(start+per(),list.length)+" of "+list.length:"0 expenses";
+  $("#prev").disabled=page<=1;$("#next").disabled=page>=pages;
+}
+const reset=()=>{page=1;renderTable()};
+[f.q,f.c,f.from,f.to,$("#perPage")].forEach(el=>el.addEventListener(el===f.q?"input":"change",reset));
+function clearAll(){f.q.value=f.c.value=f.from.value=f.to.value="";reset()}
+$("#clearFilters").onclick=clearAll;
+$("#prev").onclick=()=>{page--;renderTable()};$("#next").onclick=()=>{page++;renderTable()};
+$$("th[data-k]").forEach(th=>th.querySelector("button").onclick=()=>{
+  const k=th.dataset.k;sort={k,dir:sort.k===k?-sort.dir:(k==="amt"||k==="date"?-1:1)};
+  $$("th[data-k]").forEach(t=>t.removeAttribute("aria-sort"));th.setAttribute("aria-sort",sort.dir>0?"ascending":"descending");reset();
+});
+document.addEventListener("keydown",e=>{if(e.key==="/"&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();f.q.focus()}});
+
+/* delete confirmation */
+$("#tbody").addEventListener("click",e=>{
+  const a=e.target.closest("a.del");if(!a)return;e.preventDefault();
+  const r=rows.find(x=>x.tr.contains(a));
+  $("#delMsg").textContent=r.label+" · "+money(r.amt)+" on "+r.date+". This can't be undone.";
+  $("#delYes").href=a.getAttribute("href");$("#delDlg").showModal();
+});
+$("#delNo").onclick=()=>$("#delDlg").close();
+
+/* budget */
+$("#budBtn").onclick=()=>{$("#budInput").value=budget||"";$("#budDlg").showModal();$("#budInput").focus()};
+$("#budNo").onclick=()=>$("#budDlg").close();
+$("#budSave").onclick=()=>{budget=Math.max(0,Number($("#budInput").value)||0);store.set("et_budget",budget||null);$("#budDlg").close();first=false;paintAll()};
+
+/* currency */
+function paintAll(){
+  paintSummary();drawCharts();
+  $$(".expense-amount").forEach(el=>el.textContent=money(Number(el.dataset.inr)||0));first=false;
+}
+const sel=$("#currencySelect");
+sel.addEventListener("change",async function(){
+  const c=this.value;
+  if(c==="INR"){cur="INR";rate=1;paintAll();return}
+  sel.disabled=true;
+  try{
+    const res=await fetch("/api/currency?currency="+encodeURIComponent(c));
+    if(!res.ok)throw new Error("rate request failed");
+    const data=await res.json(),r=Number(data.rates&&data.rates[c]);
+    if(!Number.isFinite(r)||r<=0)throw new Error("invalid rate");
+    rate=r;cur=c;paintAll();
+  }catch(err){
+    console.error(err);sel.value=cur;
+    const t=document.createElement("div");t.className="toast error";t.innerHTML='<span>Couldn\'t get the exchange rate. Check your connection and try again.</span><button type="button" aria-label="Dismiss" onclick="closeFlash(this)">×</button>';
+    $("#toasts").appendChild(t);setTimeout(()=>t.isConnected&&closeFlash(t.querySelector("button")),4500);
+  }finally{sel.disabled=false}
 });
 
-let currentCurrency = "INR";
-let exchangeRate = 1;
-let baseTotal = 0;
-let baseThisMonth = 0;
-let baseAverage = 0;
-let baseHighest = 0;
-let baseCategories = {};
-let categoryChart = null;
-
-const currencySymbols = {
-    INR: "₹", USD: "$", EUR: "€", GBP: "£", AED: "د.إ ",
-    SAR: "﷼", CAD: "C$", AUD: "A$", JPY: "¥"
-};
-
-function formatMoney(value) {
-    const amount = Number(value) || 0;
-    const symbol = currencySymbols[currentCurrency] || (currentCurrency + " ");
-    return symbol + amount.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-function money(value) {
-    return formatMoney(value);
-}
-
-// API rates are expected to represent the selected currency for 1 INR.
-function convertAmountFromINR(value) {
-    const amount = Number(value) || 0;
-    return currentCurrency === "INR" ? amount : amount * exchangeRate;
-}
-
-function updateList() {
-    document.querySelectorAll(".category-amount, .expense-amount").forEach(element => {
-        const inrValue = Number(element.dataset.inr) || 0;
-        element.textContent = formatMoney(convertAmountFromINR(inrValue));
-    });
-}
-
-function updateChart() {
-    const canvas = document.getElementById("categoryChart");
-    if (!canvas || typeof Chart === "undefined") return;
-    if (categoryChart) categoryChart.destroy();
-
-    categoryChart = new Chart(canvas, {
-        type: "doughnut",
-        data: {
-            labels: Object.keys(baseCategories),
-            datasets: [{
-                label: "Spending",
-                data: Object.values(baseCategories).map(convertAmountFromINR)
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: "bottom" },
-                tooltip: {
-                    callbacks: {
-                        label: context => context.label + ": " + formatMoney(context.raw)
-                    }
-                }
-            }
-        }
-    });
-}
-
-function updateDashboardCurrency() {
-    document.getElementById("totalSpending").textContent =
-        formatMoney(convertAmountFromINR(baseTotal));
-    document.getElementById("thisMonthSpending").textContent =
-        formatMoney(convertAmountFromINR(baseThisMonth));
-    document.getElementById("averageExpense").textContent =
-        formatMoney(convertAmountFromINR(baseAverage));
-    document.getElementById("highestExpense").textContent =
-        formatMoney(convertAmountFromINR(baseHighest));
-
-    updateList();
-    updateChart();
-}
-
-async function loadDashboard() {
-    try {
-        const response = await fetch("/api/expenses/summary");
-        if (!response.ok) throw new Error("Could not load expense summary");
-
-        const data = await response.json();
-        baseTotal = Number(data.total_spending) || 0;
-        baseThisMonth = Number(data.this_month_spending) || 0;
-        baseAverage = Number(data.average_expense) || 0;
-        baseHighest = Number(data.highest_expense) || 0;
-        baseCategories = data.categories || {};
-        document.getElementById("numberOfExpenses").textContent =
-            Number(data.number_of_expenses) || 0;
-
-        updateDashboardCurrency();
-    } catch (error) {
-        console.error("Dashboard loading failed:", error);
-    }
-}
-
-const currencySelect = document.getElementById("currencySelect");
-currencySelect.addEventListener("change", async function() {
-    const selectedCurrency = this.value;
-
-    if (selectedCurrency === "INR") {
-        currentCurrency = "INR";
-        exchangeRate = 1;
-        updateDashboardCurrency();
-        return;
-    }
-
-    currencySelect.disabled = true;
-    try {
-        const response = await fetch(
-            `/api/currency?currency=${encodeURIComponent(selectedCurrency)}`
-        );
-        if (!response.ok) throw new Error("Could not fetch exchange rate");
-
-        const data = await response.json();
-        const rate = Number(data.rates && data.rates[selectedCurrency]);
-        if (!Number.isFinite(rate) || rate <= 0) {
-            throw new Error("Invalid exchange rate in API response");
-        }
-
-        exchangeRate = rate;
-        currentCurrency = selectedCurrency;
-        updateDashboardCurrency();
-    } catch (error) {
-        console.error("Currency conversion failed:", error);
-        alert("Unable to get the exchange rate. Please try again.");
-        currencySelect.value = currentCurrency;
-    } finally {
-        currencySelect.disabled = false;
-    }
-});
-
-/* Search, filter, sorting, and clear */
-const searchInput = document.getElementById("searchInput");
-const categoryFilter = document.getElementById("categoryFilter");
-const dateFilter = document.getElementById("dateFilter");
-const sortFilter = document.getElementById("sortFilter");
-const expenseList = document.getElementById("expenseList");
-const getExpenseItems = () => Array.from(document.querySelectorAll(".expense-item"));
-const originalOrder = getExpenseItems();
-
-const categories = new Set(
-    originalOrder.map(item => (item.dataset.category || "").toLowerCase())
-);
-categories.forEach(category => {
-    if (!category) return;
-    const option = document.createElement("option");
-    option.value = category;
-    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-    categoryFilter.appendChild(option);
-});
-
-function filterExpenses() {
-    const search = searchInput.value.toLowerCase().trim();
-    const category = categoryFilter.value;
-    const date = dateFilter.value;
-    const sort = sortFilter.value;
-    const allItems = getExpenseItems();
-
-    allItems.forEach(item => {
-        const description = (item.dataset.description || "").toLowerCase();
-        const itemCategory = (item.dataset.category || "").toLowerCase();
-        const itemDate = item.dataset.date || "";
-        const visible =
-            (!search || description.includes(search)) &&
-            (!category || itemCategory === category) &&
-            (!date || itemDate === date);
-        item.style.display = visible ? "" : "none";
-    });
-
-    const visibleItems = allItems.filter(item => item.style.display !== "none");
-    if (sort) {
-        visibleItems.sort((a, b) => {
-            if (sort === "amount_asc") return Number(a.dataset.amount) - Number(b.dataset.amount);
-            if (sort === "amount_desc") return Number(b.dataset.amount) - Number(a.dataset.amount);
-            if (sort === "date_asc") return new Date(a.dataset.date) - new Date(b.dataset.date);
-            if (sort === "date_desc") return new Date(b.dataset.date) - new Date(a.dataset.date);
-            return 0;
-        });
-        visibleItems.forEach(item => expenseList.appendChild(item));
-    }
-}
-
-searchInput.addEventListener("input", filterExpenses);
-categoryFilter.addEventListener("change", filterExpenses);
-dateFilter.addEventListener("change", filterExpenses);
-sortFilter.addEventListener("change", filterExpenses);
-
-document.getElementById("clearFilters").addEventListener("click", function() {
-    searchInput.value = "";
-    categoryFilter.value = "";
-    dateFilter.value = "";
-    sortFilter.value = "";
-    originalOrder.forEach(item => {
-        expenseList.appendChild(item);
-        item.style.display = "";
-    });
-});
-
-loadDashboard();
+paintAll();renderTable();
 </script>
-
+{% endraw %}
 </body>
-
 </html>
